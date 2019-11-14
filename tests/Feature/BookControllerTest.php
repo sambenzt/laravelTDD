@@ -20,19 +20,19 @@ class BookControllerTest extends TestCase
             'author' => 'Sam Benzt'
         ]);
 
-        $response->assertStatus(200);
+        $book = Book::first();
 
         $this->assertDatabaseHas('books',[  
             'title'  => 'Cool Book',
             'author' => 'Sam Benzt'
         ]);
+
+        $response->assertRedirect($book->path());
     }
 
     /** @test */ 
     public function a_title_is_required()
     {
-
-        //$this->withoutExceptionHandling();
 
         $response = $this->post('/books',[  
             'title'  => '',
@@ -41,14 +41,12 @@ class BookControllerTest extends TestCase
 
         $response->assertSessionHasErrors('title');
 
-        //$this->assertCount(0,Book::count());
+        $this->assertCount(0,Book::all());
     }
     
     /** @test */ 
     public function a_author_is_required()
     {
-
-        //$this->withoutExceptionHandling();
 
         $response = $this->post('/books',[  
             'title'  => 'Cool Book Sam',
@@ -57,14 +55,36 @@ class BookControllerTest extends TestCase
 
         $response->assertSessionHasErrors('author');
 
-        //$this->assertCount(0,Book::count());
+        $this->assertCount(0,Book::all());
     }
     
     /** @test */ 
     public function a_book_can_be_updated()
     {
+        $this->post('/books',[  
+            'title'  => 'Title',
+            'author' => 'Sam Benzt'
+        ]);
 
-        $this->withoutExceptionHandling();
+        $book = Book::first();
+
+        $response = $this->put($book->path(),[  
+            'title'  => 'New Title',
+            'author' => 'New Author'
+        ]);
+
+        $book->refresh();
+
+        $this->assertEquals('New Title',$book->title);
+
+        $this->assertEquals('New Author',$book->author);
+
+        $response->assertRedirect($book->path());
+    }
+
+    /** @test */ 
+    public function a_book_can_be_deleted()
+    {
 
         $this->post('/books',[  
             'title'  => 'Title',
@@ -73,14 +93,10 @@ class BookControllerTest extends TestCase
 
         $book = Book::first();
 
-        $response = $this->put('books/' . $book->id,[  
-            'title'  => 'New Title',
-            'author' => 'New Author'
-        ]);
+        $response = $this->delete($book->path());
 
-        $response->assertStatus(200);
+        $this->assertCount(0,Book::all());
 
-        $this->assertEquals('New Title',Book::first()->title);
-        $this->assertEquals('New Author',Book::first()->author);
+        $response->assertRedirect('/books');
     }
 }
