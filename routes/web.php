@@ -21,3 +21,10 @@ Route::put('/books/{book}','BooksController@update');
 Route::delete('/books/{book}','BooksController@destroy');
 
 Route::post('/authors','AuthorsController@store');
+
+Route::post('/checkout/{book}','CheckoutController@store');
+Route::post('/checkin/{book}','CheckinController@store');
+
+Auth::routes();
+
+Route::get('/home', 'HomeController@index')->name('home');
