@@ -21,6 +21,8 @@ class BookTest extends TestCase
         ]);
 
         $this->assertCount(1,Book::all());
+
+
    }
 
 }
